@@ -1,29 +1,22 @@
 import MainOptionStore from "../state/mainOption.jsx";
 
-
 function ToolbarBasicExample() {
-    const store = MainOptionStore();
+  const store = MainOptionStore();
 
-    const createButton = (type, label, cls) => {
-        let btnClass;
-        if (store.mainOption === type) {
-            btnClass = cls.concat(" ", "active");
-        } else {
-            btnClass = cls;
-        }
-        return (<button className={btnClass}
-                        onClick={() => store.setMainOption(type)}>
-            {label}
-        </button>);
-    };
+  const updateStore = (e) => {
+    store.setMainOption(e.target.value);
+  };
 
-    return (
-        <div className={"flex mb-4"}>
-            {createButton("custom", "Custom", "me-1 grow")}
-            {createButton("sutron_voltage", "Sutron Voltage", "mx-1 grow")}
-            {createButton("da_voltage", "DA Voltage", "ms-1 grow")}
-        </div>
-    );
+  return (
+    <div className={"flex flex-col mb-4 w-1/2 mr-2"}>
+      <label htmlFor="main-option">Type of Message</label>
+      <select name="main-option" id="main-option" onChange={updateStore}>
+        <option value="custom">Custom</option>
+        <option value="sutron_voltage">Sutron Voltage</option>
+        <option value="da_voltage">DA Voltage</option>
+      </select>
+    </div>
+  );
 }
 
 export default ToolbarBasicExample;

@@ -3,7 +3,7 @@ import MessageFormat from "./components/messageFormat.jsx";
 import "./index.css";
 import MainOptionStore from "./state/mainOption.jsx";
 import MessageFormatStore from "./state/messageFormat.jsx";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   decode_pseudobinary,
   decode_pseudobinary_b,
@@ -11,43 +11,18 @@ import {
 } from "./utils/decodeFuncs.js";
 
 function App() {
+  useEffect(() => decode(), []);
+  const [formData, setFormData] = useState({
+    message: "`BST@Ff@Ffj",
+    start: 4,
+    width: 3,
+    divider: 100,
+    multiplier: 1,
+    adder: 0,
+    nDigits: 2,
+  });
   let defaultMessage = "`BST@Ff@Ffj";
-  let mainOptionStore = MainOptionStore();
-  let messageFormatStore = MessageFormatStore();
   const [message, setMessage] = useState(defaultMessage);
-  const [start, setStart] = useState(4);
-  const [width, setWidth] = useState(3);
-  const [end, setEnd] = useState(7);
-  const [divider, setDivider] = useState(100);
-  const [multiplier, setMultiplier] = useState(1);
-  const [adder, setAdder] = useState(0);
-  const [nDigits, setNDigits] = useState(2);
-  const [messageLength, setMessageLength] = useState(message.length);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    let subMessage = message.slice(start, end);
-    console.log(subMessage);
-    let decodedValue;
-    switch (messageFormatStore.messageFormat) {
-      case "pb_positive":
-        decodedValue = decode_pseudobinary(subMessage);
-        break;
-      case "pb_signed":
-        decodedValue = decode_signed_pseudobinary(subMessage);
-        break;
-      case "pb_b":
-        decodedValue = decode_pseudobinary_b(subMessage);
-    }
-    console.log(decodedValue);
-    console.log(processData(decodedValue));
-  };
-
-  const processData = (decodedValue) => {
-    let processedValue = (decodedValue * multiplier) / divider + adder;
-    return processedValue.toFixed(nDigits);
-  };
-
   const handleMessageChange = (e) => {
     let newMessage = e.target.value.trim();
     if (newMessage === "") {
@@ -59,27 +34,87 @@ function App() {
     setMessageLength(newMessage.length);
   };
 
+  let defaultStartIndex = 4;
+  const [start, setStart] = useState(defaultStartIndex);
   const handleStartChange = (e) => {
     let startIndex = Number(e.target.value);
     setStart(startIndex);
     setEnd(width + startIndex);
   };
 
+  let defaultWidth = 3;
+  const [width, setWidth] = useState(defaultWidth);
+  const [end, setEnd] = useState(defaultStartIndex + defaultWidth);
   const handleWidthChange = (e) => {
     let widthValue = Number(e.target.value);
     setWidth(widthValue);
     setEnd(widthValue + start);
   };
 
+  let defaultDivider = 100;
+  const [divider, setDivider] = useState(defaultDivider);
   const handleDividerChange = (e) => {
     let dividerValue = Number(e.target.value);
-    console.log(dividerValue);
     if (dividerValue === 0) {
       e.target.setCustomValidity("Divider cannot be zero");
     } else {
       e.target.setCustomValidity("");
     }
     setDivider(dividerValue);
+  };
+
+  let defaultMultiplier = 1;
+  const [multiplier, setMultiplier] = useState(defaultMultiplier);
+
+  let defaultAdder = 0;
+  const [adder, setAdder] = useState(defaultAdder);
+
+  let defaultNDigits = 2;
+  const [nDigits, setNDigits] = useState(defaultNDigits);
+
+  let mainOptionStore = MainOptionStore();
+  let messageFormatStore = MessageFormatStore();
+
+  let defaultSubMessage = defaultMessage.slice(start, end);
+  const [subMessage, setSubMessage] = useState(defaultSubMessage);
+
+  const [messageLength, setMessageLength] = useState(message.length);
+
+  const [decodedData, setDecodedData] = useState(null);
+  const [processedValue, setProcessedValue] = useState(null);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (e.target.checkValidity()) {
+      decode();
+    } else {
+      e.target.reportValidity();
+    }
+  };
+
+  const decode = () => {
+    let newSubMessage = message.slice(start, end);
+    setSubMessage(newSubMessage);
+
+    let decodedValue;
+    switch (messageFormatStore.messageFormat) {
+      case "pb_positive":
+        decodedValue = decode_pseudobinary(newSubMessage);
+        break;
+      case "pb_signed":
+        decodedValue = decode_signed_pseudobinary(newSubMessage);
+        break;
+      case "pb_b":
+        decodedValue = decode_pseudobinary_b(newSubMessage);
+    }
+    let processedData = processData(decodedValue);
+    setDecodedData(decodedValue);
+    setProcessedValue(processedData);
+  };
+
+  const processData = (decodedValue) => {
+    let processedValue = (decodedValue * multiplier) / divider + adder;
+    return processedValue.toFixed(nDigits);
   };
 
   return (
@@ -89,16 +124,20 @@ function App() {
         Leave <code>Start</code> and <code>End</code> empty to decode the whole
         message. The index begins at <code>0</code>.
       </p>
+
       <hr />
+
       <div className={"flex"}>
         <MainOptions />
         <MessageFormat />
       </div>
+
       <p>
         {mainOptionStore.mainOption} {messageFormatStore.messageFormat}{" "}
         {messageLength}
       </p>
-      <form name="msg_data">
+
+      <form onSubmit={handleSubmit} name="msg_data">
         <div>
           <div className="flex flex-col w-sm-input">
             <label htmlFor="e_msg">Encoded Message</label>
@@ -107,6 +146,7 @@ function App() {
               id="e_msg"
               value={message}
               onChange={handleMessageChange}
+              autoComplete="off"
             />
           </div>
         </div>
@@ -140,7 +180,7 @@ function App() {
               className="border-gray-600 text-gray-400"
               type="text"
               value={end}
-              id=" msg_end"
+              id="msg_end"
               disabled
             />
           </div>
@@ -157,7 +197,6 @@ function App() {
               onChange={handleDividerChange}
             />
           </div>
-
           <div className="flex flex-col w-1/2 ml-2">
             <label htmlFor="mul">Multiplier</label>
             <input
@@ -181,7 +220,6 @@ function App() {
               onChange={(e) => setAdder(Number(e.target.value))}
             />
           </div>
-
           <div className="flex flex-col w-1/2 ml-2">
             <label htmlFor="ndig">Digits</label>
             <input
@@ -193,8 +231,19 @@ function App() {
             />
           </div>
         </div>
-        <button onClick={handleSubmit}>Decode</button>
+        <button type="submit">Decode</button>
       </form>
+      <section id="results">
+        <p>
+          Raw Encoded Message: <code>{subMessage}</code>
+        </p>
+        <p>
+          Decoded Data: <code>{decodedData}</code>
+        </p>
+        <p>
+          Processed Data: <code>{processedValue}</code>
+        </p>
+      </section>
     </>
   );
 }

@@ -8,7 +8,7 @@ function ToolbarBasicExample() {
   };
 
   return (
-    <div className={"flex flex-col mb-4 w-1/2 mr-2"}>
+    <div className={"flex flex-col w-1/2 mr-2"}>
       <label htmlFor="main-option">Type of Message</label>
       <select name="main-option" id="main-option" onChange={updateStore}>
         <option value="custom">Custom</option>

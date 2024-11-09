@@ -11,16 +11,33 @@ import {
 } from "./utils/decodeFuncs.js";
 
 function App() {
+  let mainOptionStore = MainOptionStore();
+  let messageFormatStore = MessageFormatStore();
   useEffect(() => decode(), []);
-  const [formData, setFormData] = useState({
-    message: "`BST@Ff@Ffj",
-    start: 4,
-    width: 3,
-    divider: 100,
-    multiplier: 1,
-    adder: 0,
-    nDigits: 2,
-  });
+
+  useEffect(() => {
+    const setFormData = () => {
+      switch (mainOptionStore.mainOption) {
+        case "sutron_voltage":
+          setStart(messageLength - 1);
+          setWidth(1);
+          setEnd(messageLength);
+          setDivider(1);
+          setMultiplier(0.234);
+          setAdder(10.6);
+          break;
+        case "da_voltage":
+          setStart(messageLength - 1);
+          setWidth(1);
+          setEnd(messageLength);
+          setDivider(1);
+          setMultiplier(0.3124);
+          setAdder(0.311);
+      }
+    };
+    setFormData();
+  }, [mainOptionStore.mainOption]);
+
   let defaultMessage = "`BST@Ff@Ffj";
   const [message, setMessage] = useState(defaultMessage);
   const handleMessageChange = (e) => {
@@ -71,9 +88,6 @@ function App() {
 
   let defaultNDigits = 2;
   const [nDigits, setNDigits] = useState(defaultNDigits);
-
-  let mainOptionStore = MainOptionStore();
-  let messageFormatStore = MessageFormatStore();
 
   let defaultSubMessage = defaultMessage.slice(start, end);
   const [subMessage, setSubMessage] = useState(defaultSubMessage);
@@ -127,16 +141,6 @@ function App() {
 
       <hr />
 
-      <div className={"flex"}>
-        <MainOptions />
-        <MessageFormat />
-      </div>
-
-      <p>
-        {mainOptionStore.mainOption} {messageFormatStore.messageFormat}{" "}
-        {messageLength}
-      </p>
-
       <form onSubmit={handleSubmit} name="msg_data">
         <div>
           <div className="flex flex-col w-sm-input">
@@ -153,6 +157,17 @@ function App() {
 
         <div className="flex mb-1 justify-between">
           <div className="flex flex-col w-1/3 mr-2">
+            <label htmlFor="msg_width">Message Width</label>
+            <input
+              type="number"
+              id="msg_width"
+              value={width}
+              onChange={handleWidthChange}
+              min={1}
+              max={Math.min(3, messageLength - start)}
+            />
+          </div>
+          <div className="flex flex-col w-1/3 mx-2">
             <label htmlFor="msg_start">Start Index</label>
             <input
               type="number"
@@ -163,17 +178,7 @@ function App() {
               max={messageLength - width}
             />
           </div>
-          <div className="flex flex-col w-1/3 mx-2">
-            <label htmlFor="msg_width">Message Width</label>
-            <input
-              type="number"
-              id="msg_width"
-              value={width}
-              onChange={handleWidthChange}
-              min="1"
-              max={"3"}
-            />
-          </div>
+
           <div className="flex flex-col w-1/3 ml-2">
             <label htmlFor="msg_end">End Index</label>
             <input
@@ -231,9 +236,18 @@ function App() {
             />
           </div>
         </div>
-        <button type="submit">Decode</button>
+        <hr className={"border-gray-600"} />
+        <div className={"flex items-center"}>
+          <MainOptions />
+          <MessageFormat />
+        </div>
+        <button className={"my-3 w-full"} type="submit">
+          Decode
+        </button>
       </form>
-      <section id="results">
+
+      <section id="results" className={"bg-gray-700 p-2 rounded"}>
+        <h2>Results</h2>
         <p>
           Raw Encoded Message: <code>{subMessage}</code>
         </p>

@@ -41,7 +41,7 @@ function App() {
   let defaultMessage = "`BST@Ff@Ffj";
   const [message, setMessage] = useState(defaultMessage);
   const handleMessageChange = (e) => {
-    let newMessage = e.target.value.trim();
+    let newMessage = e.target.value.replace(/ /g, "");
     if (newMessage === "") {
       e.target.setCustomValidity("Message cannot be empty");
     } else {

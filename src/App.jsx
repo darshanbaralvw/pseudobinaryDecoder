@@ -135,8 +135,7 @@ function App() {
     <>
       <h1>Pseudo-binary Decoder</h1>
       <p>
-        Leave <code>Start</code> and <code>End</code> empty to decode the whole
-        message. The index begins at <code>0</code>.
+        The index begins at <code>0</code>.
       </p>
 
       <hr />

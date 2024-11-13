@@ -3,7 +3,7 @@ import MessageFormat from "./components/messageFormat.jsx";
 import "./index.css";
 import MainOptionStore from "./state/mainOption.jsx";
 import MessageFormatStore from "./state/messageFormat.jsx";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   decode_pseudobinary,
   decode_pseudobinary_b,
@@ -54,40 +54,100 @@ function App() {
   let defaultStartIndex = 4;
   const [start, setStart] = useState(defaultStartIndex);
   const handleStartChange = (e) => {
-    let startIndex = Number(e.target.value);
-    setStart(startIndex);
-    setEnd(width + startIndex);
+    let startIndex = e.target.value;
+    let formattedStartIndex = Number(startIndex);
+    if (width === "") {
+      setStart(formattedStartIndex);
+      return;
+    }
+    if (startIndex === "" || width === "") {
+      setStart("");
+      setEnd("N/A");
+      e.target.setCustomValidity("Start index of sub-message cannot be empty");
+    } else {
+      setStart(formattedStartIndex);
+      setEnd(width + formattedStartIndex);
+      e.target.setCustomValidity("");
+    }
   };
 
   let defaultWidth = 3;
   const [width, setWidth] = useState(defaultWidth);
   const [end, setEnd] = useState(defaultStartIndex + defaultWidth);
   const handleWidthChange = (e) => {
-    let widthValue = Number(e.target.value);
-    setWidth(widthValue);
-    setEnd(widthValue + start);
+    let widthValue = e.target.value;
+    let formattedWidth = Number(widthValue);
+    if (widthValue === "") {
+      setWidth("");
+      setEnd("N/A");
+      e.target.setCustomValidity("Message width cannot be empty");
+    } else {
+      setWidth(formattedWidth);
+      setEnd(formattedWidth + start);
+      e.target.setCustomValidity("");
+    }
   };
 
   let defaultDivider = 100;
   const [divider, setDivider] = useState(defaultDivider);
   const handleDividerChange = (e) => {
-    let dividerValue = Number(e.target.value);
-    if (dividerValue === 0) {
-      e.target.setCustomValidity("Divider cannot be zero");
+    let dividerValue = e.target.value;
+    let formattedDividerValue = Number(dividerValue);
+
+    if (dividerValue === "") {
+      setDivider("");
+      e.target.setCustomValidity("Divider cannot be empty");
     } else {
-      e.target.setCustomValidity("");
+      setDivider(formattedDividerValue);
+      if (formattedDividerValue === 0) {
+        e.target.setCustomValidity("Divider cannot be zero");
+      } else {
+        e.target.setCustomValidity("");
+      }
     }
-    setDivider(dividerValue);
   };
 
   let defaultMultiplier = 1;
   const [multiplier, setMultiplier] = useState(defaultMultiplier);
+  const handleMultiplierChange = (e) => {
+    let multiplierValue = e.target.value;
+    let formattedMultiplierValue = Number(multiplierValue);
+    if (multiplierValue === "") {
+      setMultiplier("");
+      e.target.setCustomValidity("Multiplier cannot be empty");
+    } else {
+      setMultiplier(formattedMultiplierValue);
+      e.target.setCustomValidity("");
+    }
+  };
 
   let defaultAdder = 0;
   const [adder, setAdder] = useState(defaultAdder);
+  const handleAdderChange = (e) => {
+    let adderValue = e.target.value;
+    let formattedAdderValue = Number(adderValue);
+    if (adderValue === "") {
+      setAdder("");
+      e.target.setCustomValidity("Adder cannot be empty");
+    } else {
+      setAdder(formattedAdderValue);
+      e.target.setCustomValidity("");
+    }
+  };
 
   let defaultNDigits = 2;
   const [nDigits, setNDigits] = useState(defaultNDigits);
+  const handleNDigitsChange = (e) => {
+    let nDigitsValue = e.target.value;
+    let formattedNDigits = Number(nDigitsValue);
+    if (nDigitsValue === "") {
+      setNDigits("");
+      e.target.setCustomValidity("Number of digits cannot be empty");
+    } else {
+      setNDigits(formattedNDigits);
+      e.target.setCustomValidity("");
+    }
+  };
 
   let defaultSubMessage = defaultMessage.slice(start, end);
   const [subMessage, setSubMessage] = useState(defaultSubMessage);
@@ -156,22 +216,22 @@ function App() {
 
         <div className="flex mb-1 justify-between">
           <div className="flex flex-col w-1/3 mr-2">
-            <label htmlFor="msg_width">Message Width</label>
+            <label htmlFor="msg_width">Width</label>
             <input
               type="number"
               id="msg_width"
-              value={width}
+              value={width.toString()}
               onChange={handleWidthChange}
               min={1}
-              max={Math.min(3, messageLength - start)}
+              max={3}
             />
           </div>
           <div className="flex flex-col w-1/3 mx-2">
-            <label htmlFor="msg_start">Start Index</label>
+            <label htmlFor="msg_start">Start</label>
             <input
               type="number"
               id="msg_start"
-              value={start}
+              value={start.toString()}
               onChange={handleStartChange}
               min="0"
               max={messageLength - width}
@@ -179,7 +239,7 @@ function App() {
           </div>
 
           <div className="flex flex-col w-1/3 ml-2">
-            <label htmlFor="msg_end">End Index</label>
+            <label htmlFor="msg_end">End</label>
             <input
               className="border-gray-600 text-gray-400"
               type="text"
@@ -195,7 +255,7 @@ function App() {
             <label htmlFor="div">Divider</label>
             <input
               type="number"
-              value={divider}
+              value={divider.toString()}
               step="any"
               id="div"
               onChange={handleDividerChange}
@@ -206,9 +266,9 @@ function App() {
             <input
               type="number"
               id="mul"
-              value={multiplier}
+              value={multiplier.toString()}
               step="any"
-              onChange={(e) => setMultiplier(Number(e.target.value))}
+              onChange={handleMultiplierChange}
             />
           </div>
         </div>
@@ -218,20 +278,20 @@ function App() {
             <label htmlFor="add">Adder</label>
             <input
               type="number"
-              value={adder}
+              value={adder.toString()}
               step="any"
               id="add"
-              onChange={(e) => setAdder(Number(e.target.value))}
+              onChange={handleAdderChange}
             />
           </div>
           <div className="flex flex-col w-1/2 ml-2">
             <label htmlFor="ndig">Digits</label>
             <input
               type="number"
-              value={nDigits}
+              value={nDigits.toString()}
               id="ndig"
               min="0"
-              onChange={(e) => setNDigits(Number(e.target.value))}
+              onChange={handleNDigitsChange}
             />
           </div>
         </div>
@@ -245,7 +305,7 @@ function App() {
         </button>
       </form>
 
-      <section id="results" className={"bg-gray-700 p-2 rounded"}>
+      <section id="results" className={"bg-gray-700 p-2 rounded mb-2"}>
         <h2>Results</h2>
         <p>
           Raw Encoded Message: <code>{subMessage}</code>

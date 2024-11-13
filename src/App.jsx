@@ -232,6 +232,7 @@ function App() {
           <div className="flex flex-col w-1/3 mr-2">
             <label htmlFor="msg_width">Width</label>
             <input
+              className={"w-full"}
               type="number"
               id="msg_width"
               value={width.toString()}
@@ -243,6 +244,7 @@ function App() {
           <div className="flex flex-col w-1/3 mx-2">
             <label htmlFor="msg_start">Start</label>
             <input
+              className={"w-full"}
               type="number"
               id="msg_start"
               value={start.toString()}
@@ -251,11 +253,10 @@ function App() {
               max={messageLength - width}
             />
           </div>
-
           <div className="flex flex-col w-1/3 ml-2">
             <label htmlFor="msg_end">End</label>
             <input
-              className="border-gray-600 text-gray-400"
+              className="border-gray-600 text-gray-400 w-full"
               type="text"
               value={end}
               id="msg_end"
@@ -268,6 +269,7 @@ function App() {
           <div className=" flex flex-col w-1/2 mr-2">
             <label htmlFor="div">Divider</label>
             <input
+              className={"w-full"}
               type="number"
               value={divider.toString()}
               step="any"
@@ -278,6 +280,7 @@ function App() {
           <div className="flex flex-col w-1/2 ml-2">
             <label htmlFor="mul">Multiplier</label>
             <input
+              className={"w-full"}
               type="number"
               id="mul"
               value={multiplier.toString()}
@@ -291,6 +294,7 @@ function App() {
           <div className="flex flex-col w-1/2 mr-2">
             <label htmlFor="add">Adder</label>
             <input
+              className={"w-full"}
               type="number"
               value={adder.toString()}
               step="any"
@@ -301,6 +305,7 @@ function App() {
           <div className="flex flex-col w-1/2 ml-2">
             <label htmlFor="ndig">Digits</label>
             <input
+              className={"w-full"}
               type="number"
               value={nDigits.toString()}
               id="ndig"

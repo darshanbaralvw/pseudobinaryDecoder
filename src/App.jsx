@@ -166,9 +166,23 @@ function App() {
     }
   };
 
+  const formatSubMessage = () => {
+    let prefix = message.slice(0, start);
+    let middle = message.slice(start, end);
+    let suffix = message.slice(end, messageLength);
+    return (
+      <>
+        <span className={"text-gray-500"}>{prefix}</span>
+        <span className={"text-green-500"}>{middle}</span>
+        <span className={"text-gray-500"}>{suffix}</span>
+      </>
+    );
+  };
+
   const decode = () => {
     let newSubMessage = message.slice(start, end);
-    setSubMessage(newSubMessage);
+    let formattedSubMessage = formatSubMessage();
+    setSubMessage(formattedSubMessage);
 
     let decodedValue;
     switch (messageFormatStore.messageFormat) {
@@ -305,7 +319,10 @@ function App() {
         </button>
       </form>
 
-      <section id="results" className={"bg-gray-700 p-2 rounded mb-2"}>
+      <section
+        id="results"
+        className={"bg-gray-800 p-2 rounded mb-2 border border-gray-400"}
+      >
         <h2>Results</h2>
         <p>
           Raw Encoded Message: <code>{subMessage}</code>
